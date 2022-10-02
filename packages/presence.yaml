@@ -1,0 +1,334 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   Presence
+#   @description    :   Package for handling Presence related entities
+###############################################################################
+
+
+group:
+  residents:
+    name: Residents
+    icon: mdi:account-multiple
+    entities:
+      - device_tracker.chris
+      - device_tracker.rachel
+      - device_tracker.blane
+      - device_tracker.gage
+      - device_tracker.avery
+      - device_tracker.neal
+
+
+device_tracker:
+  - platform: composite
+    name: Chris
+    time_as: device_or_local
+    require_movement: true
+    entity_id:
+      - device_tracker.pixel_chris
+      - device_tracker.chris_smith
+      - device_tracker.pixel_chris_wifi
+      - binary_sensor.pixel_chris
+      
+  - platform: composite
+    name: Rachel
+    time_as: device_or_local
+    require_movement: true
+    entity_id:
+      - device_tracker.pixel_rachel
+      - device_tracker.rachel_smith
+      - device_tracker.pixel_rachel_wifi
+      - binary_sensor.pixel_rachel
+      
+  - platform: composite
+    name: Blane
+    time_as: device_or_local
+    require_movement: true
+    entity_id:
+      - device_tracker.pixel_blane
+      - device_tracker.blane_stacks
+      - binary_sensor.pixel_blane
+      - device_tracker.pixel_blane_wifi
+     
+  - platform: composite
+    name: Gage
+    time_as: device_or_local
+    require_movement: true
+    entity_id:
+      - device_tracker.pixel_gage
+      - device_tracker.gage_stacks
+      - binary_sensor.pixel_gage
+      - device_tracker.pixel_gage_wifi
+      
+  - platform: composite
+    name: Avery
+    time_as: device_or_local
+    require_movement: true
+    entity_id:
+      - device_tracker.iphone_avery
+      - device_tracker.avery_sneed
+      - device_tracker.iphone_avery_wifi
+      - binary_sensor.iphone_avery
+
+  - platform: composite
+    name: Neal
+    time_as: device_or_local
+    require_movement: true
+    entity_id:
+      - device_tracker.galaxy_gps
+      - device_tracker.tile_neal
+
+
+proximity:
+  home_chris:
+    devices:
+      - device_tracker.chris_smith
+    zone: home
+    tolerance: 5
+    unit_of_measurement: mi
+
+  home_rachel:
+    devices:
+      - device_tracker.rachel_smith
+    zone: home
+    tolerance: 5
+    unit_of_measurement: mi
+
+
+template:
+  - binary_sensor:
+      - name: "Pixel Chris"
+        state: >
+          {{ is_state('device_tracker.pixel_chris_wifi', 'home') }}
+        device_class: presence
+   
+      - name: "Pixel Rachel"
+        state: >
+          {{ is_state('device_tracker.pixel_rachel_wifi', 'home') }}
+        device_class: presence
+
+      - name: "Pixel Blane"
+        state: >
+          {{ is_state('device_tracker.pixel_blane_wifi', 'home') }}
+        device_class: presence
+                 
+      - name: "Pixel Gage"
+        state: >
+          {{ is_state('device_tracker.pixel_gage_wifi', 'home') }}
+        device_class: presence
+      
+      - name: "Iphone Avery"
+        state: >
+          {{ is_state('device_tracker.iphone_avery_wifi', 'home') }}
+        device_class: presence
+
+
+input_boolean:
+  home_occupied:
+    name: "Home Occupied"
+    icon: mdi:home-modern
+
+
+automation:
+  - id: home_occupancy
+    alias: "Home Occupancy"
+    mode: queued
+
+    trigger: 
+      - platform: state
+        entity_id: group.residents
+        
+      - platform: homeassistant
+        event: start
+
+      - platform: event
+        event_type: automation_reloaded
+
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: group.residents
+                state: "home"
+                
+            sequence:
+              - service: input_boolean.turn_on
+                entity_id: input_boolean.home_occupied
+
+          - conditions:
+              - condition: state
+                entity_id: group.residents
+                state: "not_home"
+                
+            sequence:
+              - service: input_boolean.turn_off
+                entity_id: input_boolean.home_occupied
+              
+              - service: script.all_gone
+
+  - id: just_got_home
+    alias: "Just Got Home"
+    mode: restart
+    
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.chris
+          - device_tracker.rachel
+          - device_tracker.blane
+          - device_tracker.gage
+          - device_tracker.avery
+          - device_tracker.neal
+        from: "not_home"
+        to: "home"
+          
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.ha_uptime
+        above: 5
+        
+    action:
+      - service: script.auto_unlock
+      
+      - choose: 
+          - conditions:
+              - condition: template
+                value_template: >
+                 {{ is_state('sensor.quiet_time', 'loud time') or is_state('input_boolean.speech_notifications', 'on') }}
+      
+            sequence:
+              - service: group.set
+                data:
+                  object_id: "arriving"
+                  add_entities: >-
+                    {{ trigger.to_state.entity_id }}
+            
+              - wait_template: "{{ is_state('binary_sensor.front_door', 'on') }}"
+             
+              - service: input_select.select_option
+                target:
+                  entity_id: input_select.media_player
+                data:
+                  option: "Living Room Thing"
+                  
+              - service: script.speech_engine
+                data:
+                  CustomMessage: >
+                    {% set person = expand('group.arriving')|map(attribute='name')|join(' and ') %}
+                    {% set peoplecount = expand('group.arriving') | count %}
+                    {% if peoplecount == 1 %}
+                      {% set is_are = ' is ' %}
+                      {% set has_have = ' has ' %}
+                    {% else %}
+                      {% set is_are = ' are ' %}
+                      {% set has_have = ' have ' %}
+                    {% endif %}
+                    {% macro greeting_sentence(person, is_are, has_have) %}
+                    {{ [
+                      person ~ has_have + " arrived.",
+                      "My sensors are picking up the presence of additional humans. " ~ person ~ has_have + " been identified as home.",
+                      "Guess who is home?" ~ person ~ is_are,
+                      "I am sensing a disturbance in the force. "  ~ person +" must be home!",
+                      person ~ is_are + "now in the house.",
+                      person  ~ is_are + " now here.  Hash tag Welcome Home.",
+                      person  ~ is_are + " now here.  Hash tag Home.",
+                      "I know a secret! "  ~ person ~ is_are +" home!",
+                      "Just a quick announcement. " ~ person ~ has_have +" arrived!",
+                      "Hey" ~ person + "! High Five! Glad you are finally home.",
+                      "Just a quick announcement. " ~ person ~ has_have + "  arrived!",
+                      person ~ has_have + " finally made it home."
+                      "Pardon the interruption but " ~ person ~ is_are +" home!",
+                      "My systems are picking up the presence of additional humans. " ~ person  ~ is_are +" being identified as home.",
+                      "Welcome home "~person + "! It is nice to see you again! Let me turn on the lights. ",
+                      "It looks like "~person ~ is_are + " finally home! I will get the house ready for you. "
+                      "Welcome Home " ~ person + ".  We have missed you. Or at least Grayson did.",
+                      "Our home is now complete, Rest your head and relax your feet! Welcome Back " ~ person,
+                      "Life is like a song, you're back where you belong. Welcome home " ~ person,
+                      "Hey there " ~ person + " Welcome Home!",
+                      "The wifi just got a little more crowded.  Welcome Home" ~ person,
+                      "And the house becomes a home. Welcome back " ~ person,
+                      "Hey "  ~ person +". Your arrival has been recorded by the Smartest house on the block.",
+                      "Knock Knock. Who is There? "   ~ person  ~ is_are ,
+                      ] | random }}
+                    {% endmacro %}
+                    {{ greeting_sentence(person, is_are, has_have) }}
+                  call_inspirational_quote: 1
+
+      - wait_template: >
+          {{ is_state('binary_sensor.front_door', 'on') }}
+      
+      - delay: "00:00:10"
+      
+      - service: script.auto_lock
+      
+      - delay: "00:01:00"
+         
+      - service: group.set
+        data:
+          object_id: "arriving"
+          entities: []
+      
+  - id: departure
+    alias: "Departure"
+
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.chris
+          - device_tracker.rachel
+          - device_tracker.blane
+          - device_tracker.gage
+          - device_tracker.avery
+        from: "home"
+        to: "not_home"
+
+    condition:
+      - condition: state
+        entity_id: binary_sensor.front_door
+        state: "off"
+
+    action:
+      - service: lock.lock
+        target:
+          entity_id: lock.lock_thing
+
+      - service: notify.parents
+        data:
+          message: "Door is Locked for {{ trigger.to_state.attributes.friendly_name }}"
+
+
+script:
+  auto_unlock:
+    alias: "Auto Unlock"
+    sequence:
+      - service: lock.unlock
+        target:
+          entity_id: lock.lock_thing
+
+  auto_lock:
+    alias: "Auto Lock"
+    sequence:
+      - delay: 00:00:05
+      
+      - wait_template: >
+          {{ is_state('binary_sensor.front_door', 'off') }}
+          
+      - service: lock.lock
+        target:
+          entity_id: lock.lock_thing
+
+  all_gone:
+    alias: "All Gone"
+    sequence:
+      - service: light.turn_off
+        entity_id: 
+          - light.livingroom_lights
+          - light.masterbedroom_lights
+
+      - service: media_player.turn_off
+        entity_id: media_player.lgtv
+
+      - service: media_player.turn_off
+        entity_id: media_player.vizio_tv
+        
+  

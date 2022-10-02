@@ -1,0 +1,69 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   Configuration
+#   @description    :   Configuration Boot Strap
+###############################################################################
+api:
+automation: !include automations.yaml
+
+config:
+conversation:
+
+default_config:
+discovery:
+
+frontend:
+  themes: !include_dir_merge_named themes
+
+homeassistant:
+  name: Smithz Rezidenz
+  latitude: !secret lat
+  longitude: !secret long
+  elevation: !secret elevation
+  internal_url: !secret internal_url
+  external_url: !secret external_url
+  packages: !include_dir_named packages
+  temperature_unit: !secret temp_unit
+  time_zone: !secret time_zone
+  customize: !include customize.yaml
+  currency: USD
+  unit_system: Imperial
+  media_dirs:
+    sounds: /media/sounds
+  whitelist_external_dirs:
+    - /config/www
+
+lovelace:
+  mode: yaml
+  resources: !include config/lovelace/resources.yaml
+  dashboards:
+    mobile-ui:
+      mode: yaml
+      filename: mobile_ui.yaml
+      title: "Mobile UI"
+      icon: mdi:cellphone-basic
+      show_in_sidebar: true
+
+map:
+media_extractor:
+media_player:
+mobile_app:
+
+ssdp:
+sun:
+switch:
+system_health:
+
+virtual:
+
+wake_on_lan:
+
+zeroconf:
+zha:
+  zigpy_config:
+    network:
+      channel: 15
+      channels: [15, 20, 25]
+    ota:
+      ledvance_provider: true

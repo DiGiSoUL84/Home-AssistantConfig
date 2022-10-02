@@ -1,0 +1,389 @@
+title: Home
+icon: mdi:home-outline
+path: home
+cards:
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: "custom:button-card"
+            entity: person.chris
+            aspect_ratio: 1/1
+            name: Chris
+            show_entity_picture: true
+            show_name: false
+            hold_action:
+              action: none
+            state:
+              - value: home
+                styles:
+                  card:
+                    - background-color: "#4285f4"
+                  custom_fields:
+                    icon:
+                      - border-color: "#FF0000"
+              - value: not_home
+                styles:
+                  card:
+                    - background-color: "#f4b400"
+                  custom_fields:
+                    icon:
+                      - border-color: "#0F0F0F"
+              - value: Ruger2
+                styles:
+                  card:
+                    - background-color: "#0f9d58"
+                  custom_fields:
+                    icon:
+                      - border-color: "#0F0F0F"
+            styles:
+              card:
+                - --keep-background: "true"
+                - background-color: black
+                - border-radius: 5%
+                - padding: 5%
+                - color: black
+                - font-size: 10px
+                - text-shadow: 0px 0px 0px black
+                - text-transform: capitalize
+                - justify-self: end
+                - align-self: middle
+              grid:
+                - grid-template-areas: '"icon status" "n n" "battery proximity" "wifi ss" "sd sd"'
+                - grid-template-columns: 2fr 1fr
+                - grid-template-rows: 1fr min-content min-content min-content min-content
+              name:
+                - font-size: 15px
+                - align-self: middle
+                - justify-self: start
+                - padding-bottom: 10px
+              custom_fields:
+                icon:
+                  - clip-path: circle()
+                  - width: 80%
+                  - pointer-events: none
+                  - display: grid
+                  - border: 5px solid
+                  - border-color: gray
+                  - border-radius: 500px
+                  - margin: 0 +10% 0 0
+                  - justify-self: end
+                  - opacity: 1
+              status:
+                - align-self: start
+                - justify-self: end
+                - color: black
+              proximity:
+                - padding: 0.5em 0px
+                - align-self: middle
+                - justify-self: start
+                - color: black
+              wifi:
+                - padding: 0.5em 0px
+                - align-self: middle
+                - justify-self: start
+                - color: black
+                - "--text-wifi-color-sensor": >-
+                    [[[ if (states["sensor.pixel_chris_wifi"].state == '<not connected>') return "#000000"; ]]]
+
+              battery:
+                - padding: 0.5em 0px
+                - align-self: middle
+                - justify-self: start
+                - color: black
+                - "--text-color-sensor": >-
+                    [[[ if (states["sensor.pixel_chris_battery"].state < 50) return "#db4437"; ]]]
+
+            custom_fields:
+              icon: >
+                [[[ return entity === undefined ? null : `<img src="${states[entity.entity_id].attributes.entity_picture}" width="100%">`; ]]]
+
+              status: |
+                [[[
+                  if (states['person.chris'].state =='not_home') { 
+                  return `<ha-icon icon="mdi:home-export-outline"
+                    style="width: 20px; height: 20px; color: '#000000';">
+                    </ha-icon><span> Away</span>`;
+                  } 
+                  if (states['person.chris'].state =='home') { 
+                  return `<ha-icon 
+                    icon="mdi:home"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon><span> ${entity.state}</span>`;
+                } else {
+                  return `<ha-icon 
+                    icon="mdi:map-marker-radius"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon><span> ${entity.state}</span>`;
+                }
+                ]]]
+              proximity: |
+                [[[
+                  return `<ha-icon
+                    icon="mdi:map-marker-distance"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon>  <span>\<span style="color: var(--text-color-sensor);">${states['proximity.home_chris'].state} Kms</span></span>`
+                ]]]
+              battery: |
+                [[[
+                  if (states['sensor.pixel_chris_battery_state'].state =='charging') { 
+                  return `<ha-icon
+                    icon="mdi:battery-charging"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon> <span><span style="color: var(--text-color-sensor);">${states['sensor.pixel_chris_battery'].state}% battery</span></span>`;
+                } else {
+                  return `<ha-icon
+                    icon="mdi:battery"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon> <span><span style="color: var(--text-color-sensor);">${states['sensor.pixel_chris_battery'].state}% battery</span></span>`;
+                }
+                ]]]
+              wifi: |
+                [[[
+                  if (states['sensor.pixel_chris_wifi'].state =='<not connected>') { 
+                  return `<ha-icon
+                    icon="mdi:wifi"
+                    style="width: 20px; height: 20px; color: var(--text-wifi-color-sensor);">
+                    </ha-icon> <span><span style="color: var(--text-wifi-color-sensor);">Disconnected</span></span>`; 
+                } else {
+                  return `<ha-icon
+                    icon="mdi:wifi"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon> <span><span style="color: var(--text-color-sensor);">${states['sensor.pixel_chris_wifi'].state}</span></span>`;
+                }
+                ]]]
+
+          - type: "custom:button-card"
+            entity: person.rachel
+            aspect_ratio: 1/1
+            name: Rachel
+            show_entity_picture: true
+            show_name: false
+            hold_action:
+              action: none
+            state:
+              - value: home
+                styles:
+                  card:
+                    - background-color: "#4285f4"
+                  custom_fields:
+                    icon:
+                      - border-color: "#0F0F0F"
+              - value: not_home
+                styles:
+                  card:
+                    - background-color: "#f4b400"
+                  custom_fields:
+                    icon:
+                      - border-color: "#0F0F0F"
+              - value: Ruger
+                styles:
+                  card:
+                    - background-color: "#0f9d58"
+                  custom_fields:
+                    icon:
+                      - border-color: "#0F0F0F"
+            styles:
+              card:
+                - --keep-background: "true"
+                - background-color: black
+                - border-radius: 5%
+                - padding: 5%
+                - color: black
+                - font-size: 10px
+                - text-shadow: 0px 0px 0px black
+                - text-transform: capitalize
+                - justify-self: end
+                - align-self: middle
+              grid:
+                - grid-template-areas: '"icon status" "n n" "battery proximity" "wifi ss" "sd sd"'
+                - grid-template-columns: 2fr 1fr
+                - grid-template-rows: 1fr min-content min-content min-content min-content
+              name:
+                - font-size: 15px
+                - align-self: middle
+                - justify-self: start
+                - padding-bottom: 10px
+              custom_fields:
+                icon:
+                  - clip-path: circle()
+                  - width: 80%
+                  - pointer-events: none
+                  - display: grid
+                  - border: 5px solid
+                  - border-color: gray
+                  - border-radius: 500px
+                  - margin: 0 +10% 0 0
+                  - justify-self: end
+                  - opacity: 1
+              status:
+                - align-self: start
+                - justify-self: end
+                - color: black
+              proximity:
+                - padding: 0.5em 0px
+                - align-self: middle
+                - justify-self: start
+                - color: black
+              wifi:
+                - padding: 0.5em 0px
+                - align-self: middle
+                - justify-self: start
+                - color: black
+                - "--text-wifi-color-sensor": >-
+                    [[[ if (states["sensor.pixel_rachel_wifi"].state == '<not connected>') return "#000000"; ]]]
+
+              battery:
+                - padding: 0.5em 0px
+                - align-self: middle
+                - justify-self: start
+                - color: black
+                - "--text-color-sensor": >-
+                    [[[ if (states["sensor.pixel_rachel_battery"].state < 50) return "#db4437"; ]]]
+
+            custom_fields:
+              icon: >
+                [[[ return entity === undefined ? null : `<img src="${states[entity.entity_id].attributes.entity_picture}" width="100%">`; ]]]
+
+              status: |
+                [[[
+                  if (states['person.rachel'].state =='not_home') { 
+                  return `<ha-icon icon="mdi:home-export-outline"
+                    style="width: 20px; height: 20px; color: '#000000';">
+                    </ha-icon><span> Away</span>`;
+                  } 
+                  if (states['person.rachel'].state =='home') { 
+                  return `<ha-icon 
+                    icon="mdi:home"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon><span> ${entity.state}</span>`;
+                } else {
+                  return `<ha-icon 
+                    icon="mdi:map-marker-radius"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon><span> ${entity.state}</span>`;
+                }
+                ]]]
+              proximity: |
+                [[[
+                  return `<ha-icon
+                    icon="mdi:map-marker-distance"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon>  <span>\<span style="color: var(--text-color-sensor);">${states['proximity.home_rachel'].state} Kms</span></span>`
+                ]]]
+              battery: |
+                [[[
+                  if (states['sensor.pixel_rachel_battery_state'].state =='charging') { 
+                  return `<ha-icon
+                    icon="mdi:battery-charging"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon> <span><span style="color: var(--text-color-sensor);">${states['sensor.pixel_rachel_battery'].state}% battery</span></span>`;
+                } else {
+                  return `<ha-icon
+                    icon="mdi:battery"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon> <span><span style="color: var(--text-color-sensor);">${states['sensor.pixel_rachel_battery'].state}% battery</span></span>`;
+                }
+                ]]]
+              wifi: |
+                [[[
+                  if (states['sensor.pixel_rachel_wifi'].state =='<not connected>') { 
+                  return `<ha-icon
+                    icon="mdi:wifi"
+                    style="width: 20px; height: 20px; color: var(--text-wifi-color-sensor);">
+                    </ha-icon> <span><span style="color: var(--text-wifi-color-sensor);">Disconnected</span></span>`; 
+                } else {
+                  return `<ha-icon
+                    icon="mdi:wifi"
+                    style="width: 20px; height: 20px; color: #000000;">
+                    </ha-icon> <span><span style="color: var(--text-color-sensor);">${states['sensor.pixel_rachel_wifi'].state}</span></span>`;
+                }
+                ]]]
+
+      - type: entity-filter
+        show_empty: false
+        card:
+          type: glance
+          title: Who's Home
+          show_state: false
+          show_name: false
+          show_header_toggle: false
+        state_filter:
+          - home
+        entities:
+          - device_tracker.chris
+          - device_tracker.rachel
+          - device_tracker.blane
+          - device_tracker.gage
+          - device_tracker.neal
+          - device_tracker.avery
+
+      - type: entities
+        title: Check Configuration
+        show_header_toggle: false
+        entities:
+          - script.check_config
+          - sensor.config_result
+              
+      - type: custom:button-card
+        name: Lock Thing
+        entity: lock.lock_thing
+        tap_action:
+          action: toggle
+        state:
+          - icon: mdi:lock-open-variant
+            styles:
+              card:
+                - height: 100px
+              icon:
+                - width: 25%
+                - opacity: 0.5
+              name:
+                - padding: 5px 0px
+                - font-size: 15px
+                - text-overflow: unset
+                - white-space: unset
+                - word-break: break-word
+            value: unlocked
+            name: Unlocked
+            color: red
+          - icon: mdi:lock
+            color: green
+            name: Locked
+            operator: default
+            styles:
+              card:
+                - height: 100px
+              icon:
+                - width: 25%
+              name:
+                - padding: 5px 0px
+                - font-size: 15px
+                - text-overflow: unset
+                - white-space: unset
+                - word-break: break-word
+
+  - type: vertical-stack
+    in_card: true
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            show_state: true
+            no_card: true
+            title: Modes
+            show_header_toggle: false
+            entities:
+              - entity: input_boolean.home_occupied
+                name: Occupied
+              - entity: input_boolean.speech_notifications
+                name: Speech
+              - entity: sensor.time_of_day
+                name: Current Time Of Day
+              - entity: sensor.home_mode
+                name: Home Mode
+              - entity: sensor.quiet_time
+                name: Quiet Time
+              - entity: binary_sensor.workday
+                name: Workday
+

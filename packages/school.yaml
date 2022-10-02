@@ -1,0 +1,126 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   School
+#   @description    :   Package for handling School related entities
+###############################################################################
+
+
+input_datetime:
+  school_first_day:
+    name: First Day of School
+    has_date: true
+    has_time: false
+  
+  school_last_day:
+    name: Last Day of School
+    has_date: true
+    has_time: false
+    
+    
+input_boolean:
+  school_in_session:
+    name: School In Session
+    icon: mdi:bus-school
+    
+  school_today:
+    name: School Today
+    icon: mdi:bus-school
+    
+    
+sensor:
+  - platform: template
+    sensors:
+      school_start_days2go:
+        friendly_name: "School Start Days2Go"
+        value_template: "{{ ((state_attr('input_datetime.school_first_day', 'timestamp')-as_timestamp(now())) | int /60/1440) | round(0) }}"
+        unit_of_measurement: 'Days'
+    
+      school_end_days2go:
+        friendly_name: "School End Days2Go"
+        value_template: "{{ ((state_attr('input_datetime.school_last_day', 'timestamp')-as_timestamp(now())) | int /60/1440) | round(0) }}"
+        unit_of_measurement: 'Days'
+
+      school_tomorrow:
+        friendly_name: "School Tomorrow"
+        value_template: >-
+          {%- set test=(as_timestamp(now())+ (86400)) | timestamp_custom("%Y-%m-%d",true) %}
+          {% if states.calendar.neal.attributes.start_time == test + " 08:25:00" %}
+            on
+          {% else %}
+            off
+          {% endif %}
+
+      school_today:
+        friendly_name: "School Today"
+        value_template: >-
+          {% if as_timestamp(strptime(state_attr('calendar.neal', 'start_time'), '%Y-%m-%d %H:%M:%S')) | timestamp_custom("%Y-%m-%d") == now().strftime("%Y-%m-%d") %}
+            on
+          {% else %}
+            off
+          {% endif %}
+
+
+automation:
+  - id: school_today
+    alias: "School Today"
+
+    trigger: 
+      - platform: time
+        at: "06:00"
+
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.school_today
+                state: "on"
+
+            sequence:
+              - service: script.turn_on
+                entity_id: script.school_in_session
+
+              - service: input_boolean.turn_on
+                entity_id: input_boolean.school_today
+                
+          - conditions:
+              - condition: state
+                entity_id: sensor.school_today
+                state: "off"
+                
+            sequence:
+              - service: input_boolean.turn_off
+                entity_id: input_boolean.school_today
+                
+  - id: school_year_over
+    alias: "School Year Over"
+
+    trigger:
+      - platform: time
+        at: "06:00"
+
+    condition:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: input_boolean.school_in_session
+            state: "on"
+
+          - condition: template
+            value_template: >
+              {{ states('input_datetime.school_last_day')  == now().strftime("%Y-%m-%d") }}
+
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.school_in_session
+        
+        
+script:
+  school_in_session:
+    alias: "School in Session"
+    sequence:
+      - condition: "{{ is_state('input_boolean.school_in_session', 'off') }}"
+      
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.school_in_session

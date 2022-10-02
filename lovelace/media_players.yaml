@@ -1,0 +1,28 @@
+title: Media Players
+icon: mdi:television-classic
+path: media
+cards:
+  - type: vertical-stack
+    title: Google Home Hubs & Speakers
+    cards:
+      - type: entities
+        entities:
+          - entity: switch.kitchen_thing_disturb
+            name: Kitchen Thing DND
+          - entity: media_player.kitchen_thing
+          - entity: switch.livingroom_thing_disturb
+            name: LivingRoom DND
+          - entity: media_player.livingroom_thing
+          - entity: switch.masterbedroom_thing_disturb
+            name: MBedroom DND
+          - entity: media_player.masterbedroom_thing
+          - entity: switch.masterbathroom_thing_disturb
+            name: MBathroom DND
+          - entity: media_player.masterbathroom_thing
+          - entity: switch.echo_disturb
+            name: Echo DND
+          - entity: media_player.echo
+          - entity: media_player.audio_thing
+          - entity: media_player.all_speakers
+
+     

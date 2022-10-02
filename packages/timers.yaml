@@ -1,0 +1,10 @@
+###################
+## Timer Package ##
+##################
+
+
+  timer:
+    vacuum_runtime:
+      name: "Vacuum Runtime"
+      restore: true
+      restore_grace_period: "01:00:00"

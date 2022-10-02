@@ -1,0 +1,86 @@
+title: Living Room
+icon: mdi:sofa-outline
+path: living_room
+cards:
+  - type: vertical-stack
+    title: Living Room
+    cards:
+      - type: media-control
+        entity: media_player.lgtv
+        
+      - type: vertical-stack
+        cards:
+          - type: light
+            entity: light.livingroom_lights
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:paper-buttons-row
+            buttons:
+              - entity: input_boolean.livingroom_tinkle_override
+                name: "Tinkle Override"
+                layout: [[name, icon], [state]]
+                align_icon: bottom
+      
+          - type: custom:paper-buttons-row
+            buttons:
+              - entity: switch.adaptive_lighting_livingroom
+                name: "Circadian Lighting"
+                layout: [[name, icon], [state]]
+                align_icon: bottom
+
+            
+      - type: horizontal-stack
+        cards:
+          - type: button
+            name: Candlelight
+            show_state: false
+            icon: mdi:candle   
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data: 
+                entity_id: scene.livingroom_candlelight
+
+          - type: button
+            name: Day
+            show_state: false
+            icon: mdi:weather-sunny-alert
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.livingroom_day
+    
+          - type: button
+            name: Neal Bedtime
+            show_state: false
+            icon: mdi:sleep
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data: 
+                entity_id: scene.neal_bedtime
+      
+      - type: custom:layout-card
+        layout: vertical
+        cards:
+          - type: entities
+            entities:
+              - entity: binary_sensor.livingroom_motion
+                name: Motion
+                secondary_info: last-changed
+              - entity: binary_sensor.front_door
+                name: Front Door
+                secondary_info: last-changed
+              - entity: sensor.livingroom_motion_illuminance
+                name: Illuminance
+              - entity: sensor.livingroom_motion_temp
+                name: Motion Temp
+              - entity: input_boolean.has_vacuum_ran
+                name: Has Vacuum Ran
+              - entity: select.vacuum_thing_mode
+                name: Vacuum Thing Mode
+
+          - type: custom:tuya-vacuum-card
+            entity: vacuum.vacuum_thing

@@ -1,0 +1,345 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   Laundry 
+#   @description    :   Package for handling Laundry related entities
+###############################################################################
+
+
+mqtt:
+  sensor:
+    - name: "Washer Status"
+      state_topic: washer/status
+
+    - name: "Dryer Status"
+      state_topic: dryer/status
+
+
+input_number:
+  washer_cycles:
+    name: "Number of Cycles"
+    min: 0
+    max: 100
+    step: 1
+    mode: box
+    icon: mdi:washing-machine
+
+
+sensor:
+  - platform: rest
+    name: 'Washer API'
+    resource: https://api.smartthings.com/v1/devices/173569bc-2930-c8d7-7dfa-debfd2e5dff8/status
+    authentication: basic
+    scan_interval: 31536000
+    value_template: "{{ 'SmartThings API data' }}"
+    json_attributes:
+      - components
+    headers:
+      Content-Type: application/json
+      Authorization: !secret apiToken
+
+  - platform: rest
+    name: 'Dryer API'
+    resource: https://api.smartthings.com/v1/devices/44b09f10-b4c6-5963-948f-452790aa6ad9/status
+    authentication: basic
+    scan_interval: 31536000
+    value_template: "{{ 'SmartThings API data' }}"
+    json_attributes:
+      - components
+    headers:
+      Content-Type: application/json
+      Authorization: !secret apiToken
+  
+  - platform: template
+    sensors:
+      washer_thing_cycles:
+        friendly_name: "Washer Thing Cycles"
+        value_template: >
+          {{ states('input_number.washer_cycles') }}
+
+      washer_thing_state:
+        friendly_name: "Washer Thing State"
+        value_template: >
+          {% if states('switch.washer_thing')|lower == "off" %}
+            Off
+          {% elif states('switch.washer_thing')|lower == "on" %}
+            {% if states('sensor.washer_thing_machine_state')|lower != "run" %}
+              {{ states('sensor.washer_thing_machine_state')|capitalize }}
+            {% else -%}
+              {{ states('sensor.washer_thing_job_state')|capitalize }}
+            {% endif %}
+          {% else %}
+            Unavailable
+          {% endif %}
+        icon_template: "{{ 'mdi:washing-machine' }}"
+
+      washer_thing_time_remaining:
+        friendly_name: "Washer Thing Remaining Time"
+        value_template: >
+          {% if states('switch.washer_thing')|lower == "on" and states('sensor.washer_thing_machine_state')|lower != "stop" -%}
+            {% if states('sensor.washer_thing_job_state')|lower != "none" and states('sensor.washer_thing_job_state')|lower != "finish" -%}
+              {% if as_timestamp(states('sensor.washer_thing_completion_time')) > utcnow().timestamp() -%}
+                {% if states('sensor.washer_thing_job_state')|lower == "delaywash" -%}
+                  {{ (( as_timestamp(states('sensor.washer_thing_completion_time')) - utcnow().timestamp() ) + 60) | timestamp_custom ("%H:%M", false) }}
+                {% else -%}
+                  {{ (( as_timestamp(states('sensor.washer_thing_completion_time')) - utcnow().timestamp() ) + 60) | timestamp_custom ("%H:%M", false) }}
+                {% endif -%}
+              {% else -%}
+                Done
+              {% endif -%}
+            {% else -%}
+              Idle
+            {% endif -%}
+          {% elif states('switch.washer_thing')|lower == "off" -%}
+            Idle
+          {% else -%}
+            Unavailable
+          {% endif -%}
+        icon_template: "{{ 'mdi:washing-machine' }}"
+
+      washer_thing_time_remaining_iso:
+        friendly_name: "Washer Thing Time Remaining Time ISO"
+        value_template:  "{{ states('sensor.washer_thing_completion_time') | replace ('Z', '000+00:00') }}"
+        device_class: timestamp 
+
+      washer_program:
+        friendly_name: "Washer Program"
+        value_template: >
+          {% if states('switch.washer_thing')|lower == "off" %}
+            None
+          {% elif states('switch.washer_thing')|lower == "on" %}
+            {% if states('sensor.washer_thing_machine_state')|lower != "run" %}
+              None
+          {% else %}
+            {% if states('sensor.washer_program')[-9:] == 'Course_D6' %}
+              Bedding
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D7' %}
+              Raincoats
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D8' %}
+              Lã
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D9' %}
+              Dark Clothes
+            {% elif states('sensor.washer_program')[-9:] == 'Course_DA' %}
+              Super Eco Wash
+            {% elif states('sensor.washer_program')[-9:] == 'Course_DB' %}
+              Super Fast
+            {% elif states('sensor.washer_program')[-9:] == 'Course_DC' %}
+              Fast 15'
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D0' %}
+              Cotton
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D1' %}
+              Cotton2
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D2' %}
+              Synthetics
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D3' %}
+              Delicate clothes
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D4' %}
+              Rinse+Spin
+            {% elif states('sensor.washer_program')[-9:] == 'Course_D5' %}
+              clean drum
+            {% elif states('sensor.washer_program')[-9:] == 'Course_BA' %}
+              Drain/Spin
+            {% else -%}
+              unknown program
+            {%- endif -%}
+          {% endif -%}
+          {% else -%}
+            Unavailable
+          {% endif -%}
+        icon_template: "{{ 'mdi:washing-machine' }}"
+
+      dryer_thing_state:
+        friendly_name: "Dryer Thing State"
+        value_template: >
+          {%- if states('switch.dryer_thing')|lower == "off" -%}
+            Off
+          {%- elif states('switch.dryer_thing')|lower == "on" -%}
+            {%- if states('sensor.dryer_thing_machine_state')|lower != "run" -%}
+              {{ states('sensor.dryer_thing_machine_state')|capitalize }}
+            {%- else -%}
+              {{ states('sensor.dryer_thing_job_state')|capitalize }}
+            {%- endif -%}
+          {%- else -%}
+            Unavailable
+          {%- endif -%}
+        icon_template: "{{ 'mdi:tumble-dryer' }}"
+
+      dryer_thing_time_remaining:
+        friendly_name: "Dryer Thing Remaining Time"
+        value_template: >
+          {%- if states('switch.dryer_thing')|lower == "on" and states('sensor.dryer_thing_machine_state')|lower != "stop" -%}
+            {%- if states('sensor.dryer_thing_job_state')|lower != "none" and states('sensor.dryer_thing_job_state')|lower != "finish" -%}
+              {{ (( as_timestamp(states('sensor.dryer_thing_completion_time')) - utcnow().timestamp() ) + 60) | timestamp_custom ("%H:%M", false) }}
+            {%- else -%}
+              {{ (( as_timestamp(states('sensor.dryer_thing_completion_time')) - utcnow().timestamp() ) + 60) | timestamp_custom ("%H:%M", false) }}
+            {%- endif -%}
+          {%- elif states('switch.dryer_thing')|lower == "off" -%}
+            Idle
+          {%- else -%}
+            Unavailable
+          {%- endif -%}
+        icon_template: "{{ 'mdi:tumble-dryer' }}"
+
+      dryer_thing_time_remaining_iso:
+        friendly_name: "Dryer Thing Time Remaining Time ISO"
+        value_template:  "{{ states('sensor.dryer_thing_completion_time') | replace ('Z', '000+00:00') }}"
+        device_class: timestamp 
+
+
+script:
+  laundry_status_cast_bedroom:
+    alias: "Laundry Status Cast Bedroom"
+    sequence:
+      - condition: template
+        value_template: >
+          {{ not is_state('media_player.masterbedroom_thing', 'playing') }}
+
+      - service: cast.show_lovelace_view
+        data:
+          entity_id: media_player.masterbedroom_thing
+          view_path: laundry
+
+  laundry_status_cast_kitchen:
+    alias: "Laundry Status Cast Kitchen"
+    sequence:
+      - condition: template
+        value_template: >
+          {{ not is_state('media_player.kitchen_thing', 'playing') }}
+
+      - service: cast.show_lovelace_view
+        data:
+          entity_id: media_player.kitchen_thing
+          view_path: laundry
+
+  increase_number_missing_cycles:
+    alias: "Increase missing cycles"
+    sequence:
+      - service: input_number.decrement
+        entity_id: input_number.washer_cycles
+
+  decrease_number_missing_cycles:
+    alias: "Decrease missing cycles"
+    sequence:
+      - service: input_number.increment
+        entity_id: input_number.washer_cycles
+
+  
+automation:
+  - id: cast_laundry_status
+    alias: "Cast Laundry Status"
+
+    trigger: 
+      - platform: state
+        entity_id: sensor.washer_status
+        to: "Wash"
+
+      - platform: state
+        entity_id: sensor.dryer_state
+        to: "Drying"
+
+    condition:
+      - condition: template
+        value_template: >
+          {{ not is_state('media_player.masterbedroom_thing', 'playing') }}
+
+    action:
+      - service: cast.show_lovelace_view
+        data:
+          entity_id: media_player.masterbedroom_thing
+          view_path: laundry
+
+  - id: washer_status_update
+    alias: "Washer Status Update"
+   
+    trigger:
+      - platform: state
+        entity_id: sensor.washer_thing_state
+  
+    action:
+      - service: mqtt.publish
+        data_template:
+          payload: "{{trigger.to_state.state}}"
+          topic: washer/status
+          retain: true
+
+  - id: dryer_status_update
+    alias: "Dryer Status Update"
+   
+    trigger:
+      - platform: state
+        entity_id: sensor.dryer_thing_state
+   
+    action:
+      - service: mqtt.publish
+        data_template:
+          payload: "{{trigger.to_state.state}}"
+          topic: dryer/status
+          retain: true
+
+  - id: washer_cycle_count
+    alias: 'Count cycle when washer finished'
+   
+    trigger:
+      - platform: state
+        entity_id: 'sensor.washer_thing_state'
+        to: 'Finish'
+ 
+    condition:
+      - condition: template
+        value_template: >-
+           {{ states('sensor.washer_program')[-9:] != 'Course_D4' 
+              and states('sensor.washer_program')[-9:] != 'Course_D5' 
+              and states('sensor.washer_program')[-9:] != 'Course_BA' 
+              and trigger.from_state.state != 'Off' 
+              and trigger.from_state.state != 'Stop' 
+              and trigger.from_state.state != 'None' }}
+    action:
+      - service: input_number.increment
+        data:
+          entity_id: input_number.washer_cycles
+
+  - id: drum_cleaning
+    alias: 'Notify when drum cleaning is required'
+  
+    trigger:
+      platform: state
+      entity_id: input_number.washer_cycles
+  
+    condition:
+      condition: numeric_state
+      entity_id: input_number.washer_cycles
+      above: 39
+  
+    action:
+      - service: script.speech_engine
+        data:
+          call_inform: 1
+          CustomMessage: "Washer Thing is preparing to run automated Self Cleaning"
+
+  - id: update_washer_api
+    alias: "Update SmartThings data via API"
+   
+    trigger:
+      - platform: state
+        entity_id: sensor.washer_thing_machine_state
+        to: 
+          - 'run'
+          - 'stop'
+   
+      - platform: state
+        entity_id: sensor.washer_thing_state
+        to:
+          - 'airWash'
+          - 'cooling'
+          - 'delayWash'
+          - 'preWash'
+          - 'rinse'
+          - 'spin'
+          - 'wash'
+          - 'weightSensing'
+          - 'wrinklePrevent'
+ 
+    action:
+      - service: homeassistant.update_entity
+        data:
+          entity_id: sensor.washer_api

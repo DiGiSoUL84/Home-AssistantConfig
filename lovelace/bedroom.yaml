@@ -1,0 +1,127 @@
+title: Master Bedroom
+icon: mdi:bed-king-outline
+path: master_bed
+cards:
+  - type: custom:curtain-card
+    entity: cover.curtain_thing
+    curtainColor: rgb(200,60,80,0.3)
+    direction: left
+  - type: vertical-stack
+    title: Master Bedroom
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: media-control
+            entity: media_player.vizio_tv
+
+      - type: light
+        entity: light.masterbedroom_lights
+            
+      - type: horizontal-stack
+        cards:
+          - type: custom:paper-buttons-row
+            buttons:
+              - entity: input_boolean.masterbedroom_tinkle_override
+                name: "MasterBedroom Tinkle Override"
+                layout: [[name, icon], [state]]
+             
+          - type: custom:paper-buttons-row
+            buttons:
+              - entity: switch.adaptive_lighting_masterbedroom
+                name: "Circadian Lighting"
+                layout: [[name, icon], [state]]
+      
+      - type: horizontal-stack
+        cards:
+          - type: button
+            name: Backlight
+            show_state: true
+            icon: mdi:led-strip-variant
+            tap_action:
+              action: call-service
+              service: light.toggle
+              service_data:
+                entity_id: light.vizio_backlight
+                
+          - type: button
+            name: Candlelight
+            show_state: false
+            icon: mdi:candle
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.masterbedroom_candlelight
+        
+          - type: button
+            name: Evening
+            show_state: false
+            icon: mdi:palette-outline
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data: 
+                entity_id: scene.masterbedroom_evening
+
+          - type: button
+            name: Sexy Time
+            show_state: false
+            icon: mdi:handcuffs
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data: 
+                entity_id: scene.masterbedroom_sexy_time
+  
+      - type: horizontal-stack
+        cards:
+          - type: button
+            name: Day  
+            show_state: false 
+            icon: mdi:weather-sunny-alert
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data: 
+                entity_id: scene.masterbedroom_day
+      
+          - type: button
+            name: Bedtime
+            show_state: false
+            icon: mdi:weather-night
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data: 
+                entity_id: scene.masterbedroom_bedtime
+  
+          - type: button
+            name: Sleep
+            show_state: false
+            icon: mdi:sleep
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data: 
+                entity_id: scene.masterbedroom_sleep
+    
+      - type: entities
+       # title: Curtain Thing
+        show_header_toggle: false
+        state_color: true
+        entities:
+          - type: custom:cover-control-button-row
+            name: "Curtain Thing"
+            entity: cover.curtain_thing
+            reverseButtons: true
+            hideStopButton: false
+            customTheme: true
+            stopButtonColor: 'red'
+            buttonInactiveColor: 'gray'
+            isOpenColor: 'green'
+            isClosedColor: 'blue'
+          ## used to select custom text for the buttons
+            customOpenText: 'OPEN'
+            customStopText: 'STOP'
+            customCloseText: 'CLOSE'
+        

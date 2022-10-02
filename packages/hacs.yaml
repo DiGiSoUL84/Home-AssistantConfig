@@ -1,0 +1,13 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   08/11/2022
+#   @package        :   HACS
+#   @description    :   Package for handling HACS
+###############################################################################
+
+
+hacs:
+  token: !secret hacs-token
+  appdaemon: true
+  netdaemon: false
+  experimental: true

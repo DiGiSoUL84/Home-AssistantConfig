@@ -1,0 +1,128 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   Daily Events
+#   @description    :   Package for handling Daily Events
+###############################################################################
+
+
+sensor:
+  - platform: template
+    sensors:
+      quiet_time:
+        friendly_name: "Quiet Time"
+        value_template: >
+          {% set current_hour = strptime(states('sensor.time'), "%H:%M").hour %}
+          {% if 6 <= current_hour < 22 %}
+            loud time
+          {% else %}
+            quiet time
+          {% endif %}
+
+      home_mode:
+        friendly_name: "Home Mode"
+        value_template: >
+          {% if is_state('binary_sensor.early_morning', 'on') %}
+            early morning
+          {% elif is_state('binary_sensor.morning', 'on') %}
+            morning
+          {% elif is_state('binary_sensor.afternoon', 'on') %}
+            afternoon
+          {% elif is_state('binary_sensor.evening', 'on') %}
+            evening
+          {% elif is_state('binary_sensor.bedtime', 'on') %}
+            bedtime
+          {% elif is_state('binary_sensor.sleep', 'on') %}
+            sleep
+          {% else %}
+            late night
+          {% endif %}
+        icon_template: mdi:content-paste
+
+      time_of_day:
+        friendly_name: "Time of Day"
+        value_template: >
+          {% if is_state('binary_sensor.early_morning', 'on') %}
+            early morning
+          {% elif is_state('binary_sensor.morning', 'on') %}
+            morning
+          {% elif is_state('binary_sensor.afternoon', 'on') %}
+            afternoon
+          {% elif is_state('binary_sensor.evening', 'on') %}
+            evening
+          {% elif is_state('binary_sensor.bedtime', 'on') %}
+            bedtime
+          {% elif is_state('binary_sensor.sleep', 'on') %}
+            sleep
+          {% else %}
+            late night
+          {% endif %}
+        icon_template: mdi:clock-digital
+
+
+automation:
+
+
+
+script:
+  lock_check:
+    alias: "Lock Check"
+    sequence:
+      - condition: state
+        entity_id: binary_sensor.front_door
+        state: "off"
+
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: lock.lock_thing
+                state: "unlocked"
+
+            sequence:
+              - service: lock.lock
+                target:
+                  entity_id: lock.lock_thing
+
+  early_morning:
+    alias: "Early Morning"
+    sequence:
+      - service: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.livingroom_tinkle_override
+
+  afternoon:
+    alias: "Afternoon"
+    sequence:
+      - service: script.livingroom_circadian_on
+
+  evening:
+    alias: "Evening"
+    sequence:
+      - service: script.livingroom_circadian_off
+
+  bedtime:
+    alias: "Bedtime"
+    sequence:
+      - service: script.masterbedroom_circadian_off
+
+      - scene: scene.masterbedroom_bedtime
+
+      - scene: scene.neal_bedtime
+
+
+
+
+  start_vacuum:
+    alias: "Start Vacuum"
+    sequence:
+      - service: vacuum.start
+        target:
+          entity_id: vacuum.vacuum_thing
+    
+      - delay: 00:10:00
+      
+      - service: vacuum.return_to_base
+        target:
+          entity_id: vacuum.vacuum_thing
+          

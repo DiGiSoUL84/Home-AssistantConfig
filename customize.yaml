@@ -1,0 +1,99 @@
+## Lights ##
+
+## Doors ##
+binary_sensor.front_door:
+  icon: mdi:door-open
+  device_class: door
+binary_sensor.laundry_door:
+  icon: mdi:door-open
+  device_class: door
+binary_sensor.guestbathroom_door:
+  icon: mdi:door-open
+  device_class: door
+binary_sensor.masterbathroom_door:
+  icon: mdi:door-open
+  device_class: door
+  
+## Motion ##
+binary_sensor.hallway_motion:
+  icon: mdi:walk
+  device_class: motion
+binary_sensor.livingroom_motion:
+  icon: mdi:walk
+  device_class: motion
+binary_sensor.guestbathroom_motion:
+  icon: mdi:walk
+  device_class: motion
+binary_sensor.masterbathroom_motion:
+  icon: mdi:walk
+  device_class: motion
+  
+## Battery ##
+sensor.hallway_motion_battery:
+  icon: mdi:battery-high
+  device_class: battery
+sensor.livingroom_motion_battery:
+  icon: mdi:battery-high
+  device_class: battery
+sensor.guestbathroom_motion_battery:
+  icon: mdi:battery-high
+  device_class: battery
+sensor.masterbathroom_door_battery:
+  icon: mdi:battery-high
+  device_class: battery
+sensor.guestbathroom_door_battery:
+  icon: mdi:battery-high
+  device_class: battery
+sensor.laundry_door_battery:
+  icon: mdi:battery-high
+  device_class: battery
+sensor.front_door_battery:
+  icon: mdi:battery-high
+  device_class: battery
+  
+## Media Players ##
+media_player.masterbedroom_thing:
+  icon: phu:home-max
+  device_class: speaker
+media_player.masterbathroom_thing:
+  icon: phu:home-mini
+  device_class: speaker
+media_player.livingroom_thing:
+  icon: phu:home-mini
+  device_class: speaker
+media_player.kitchen_thing:
+  icon: phu:home-max
+  device_class: speaker
+media_player.audio_thing:
+  icon: mdi:speaker-multiple
+  device_class: speaker
+media_player.all_speakers:
+  icon: mdi:speaker-multiple
+  device_class: speaker  
+media_player.lgtv:
+  icon: mdi:television-classic
+  device_class: tv
+media_player.vizio_tv:
+  icon: mdi:television-classic
+  device_class: tv
+  
+## Device Trackers ##
+device_tracker.chris:
+  friendly_name: "Chris"
+  entity_picture: /local/images/residents/chris.jpg
+device_tracker.rachel:
+  friendly_name: "Rachel"
+  entity_picture: /local/images/residents/rachel.jpg
+device_tracker.blane:
+  friendly_name: "Blane"
+  entity_picture: /local/images/residents/blane.jpg
+device_tracker.gage:
+  friendly_name: "Gage"
+  entity_picture: /local/images/residents/gage.jpg
+device_tracker.avery:
+  friendly_name: "Avery"
+device_tracker.neal:
+  friendly_name: "Neal"
+  entity_picture: /local/images/residents/neal.jpg
+zone.home:
+  radius: 225

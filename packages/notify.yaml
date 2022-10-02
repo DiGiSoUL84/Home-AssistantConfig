@@ -1,0 +1,90 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   Notification
+#   @description    :   Package for handling Notification related entities
+###############################################################################
+
+
+notify:
+#  - platform: iq_notify 
+#    name: "IQ"
+#    time: 2
+#    pairs:
+#      - entity: device_tracker.chris
+#        service: pushbullet
+     
+#      - entity: device_tracker.rachel
+#        service: pushbullet2
+        
+#      - entity: device_tracker.blane
+#        service: mobile_app_pixel_blane
+        
+        
+  - name: "Pushbullet"
+    platform: pushbullet
+    api_key: !secret pushbullet-api
+
+  - name: "Pushbullet2"
+    platform: pushbullet
+    api_key: !secret pushbullet2-api
+
+  - name: "Everybody"
+    platform: group
+    services:
+      - service: mobile_app_pixel_chris
+      - service: mobile_app_pixel_rachel
+      - service: mobile_app_pixel_blane
+      - service: mobile_app_pixel_gage
+      
+  - name: "Parents"
+    platform: group
+    services:
+      - service: mobile_app_pixel_chris
+      - service: mobile_app_pixel_rachel
+      
+  - name: "Kids"
+    platform: group
+    services: 
+      - service: mobile_app_pixel_blane
+      - service: mobile_app_pixel_gage
+      
+  - name: "Chris"
+    platform: group
+    services:
+      - service: mobile_app_pixel_chris
+      
+  - name: "Rachel"
+    platform: group
+    services:
+      - service: mobile_app_pixel_rachel
+      
+  - name: "Blane"
+    platform: group
+    services:
+      - service: mobile_app_pixel_blane
+      
+  - name: "Gage"
+    platform: group
+    services:
+      - service: mobile_app_pixel_gage
+
+
+tts:    
+  - platform: google_cloud
+    key_file: veronica-tts.json
+    language: en-GB
+    gender: female 
+    voice: en-GB-Wavenet-C
+    encoding: mp3
+    cache: true
+    cache_dir: /tmp/tts_cache
+    time_memory: 28800 
+    text_type: ssml
+    profiles:
+      - telephony-class-application
+      - wearable-class-device
+      - small-bluetooth-speaker-class-device
+      - medium-bluetooth-speaker-class-device
+
+

@@ -1,0 +1,75 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   Climate
+#   @description    :   Package for handling Climate related entities
+###############################################################################
+
+
+sensor:
+  - platform: pirateweather
+    name: "PW"
+    api_key: !secret pirate-key
+    scan_interval: "00:15:00"
+    forecast:
+    - 0
+    - 1 
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    
+    monitored_conditions:
+      - temperature
+      - precip_probability
+      - precip_type
+      - humidity
+      - cloud_cover
+      - nearest_storm_distance
+      - precip_intensity
+      - wind_speed
+
+  - platform: template
+    sensors:
+      clothing_forecast:
+        friendly_name: "Clothing Forecast"
+        value_template: >-
+            {%- if states('sensor.pw_temperature')|int > 63 %}
+              {%- if states('sensor.pw_temperature')|int < 80 %}
+                Nice
+              {% elif states('sensor.pw_temperature')|int > 95 %}
+                Hot
+              {% else %}
+                Toasty
+              {%- endif %}
+            {% elif states('sensor.pw_temperature')|int < 64 %}
+              {%- if states('sensor.pw_temperature')|int < 32 %}
+                Freezing
+              {% elif states('sensor.pw_temperature')|int > 50 %}
+                Chilly
+              {% else %}
+                Cold
+              {%- endif %}
+            {% else %}
+              Unknown
+            {%- endif %}
+            
+      nest_thing_hvac_mode:
+        friendly_name: "Nest Thing HVAC Mode"
+        value_template: >
+          {% if is_state_attr('climate.nest_thing', 'preset_mode', 'eco') %}
+            eco
+          {% else %}
+            {{ states('climate.nest_thing') }}
+          {% endif %}
+          
+          
+weather:
+  - platform: pirateweather
+    api_key: !secret pirate-key
+    latitude: !secret lat
+    longitude: !secret long
+    mode: daily
+    name: "PirateWeather"

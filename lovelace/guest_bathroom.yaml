@@ -1,0 +1,28 @@
+title: Guest Bathroom
+icon: mdi:paper-roll-outline
+path: guest_bath
+cards:
+  - type: vertical-stack
+    title: Guest Bathroom
+    cards:
+      - type: light
+        entity: light.guestbathroom_lights
+      
+      - type: custom:layout-card
+        layout: vertical
+        cards:
+          - type: entities
+            entities:
+              - entity: binary_sensor.guestbathroom_motion
+                name: Motion
+                secondary_info: last-changed
+              - entity: binary_sensor.guestbathroom_door
+                name: Door
+                secondary_info: last-changed
+              - entity: sensor.guestbathroom_motion_temp
+                name: Motion Temp
+              - entity: input_boolean.guestbathroom_occupied
+                name: Occupied
+              - entity: input_boolean.guestbathroom_override
+                name: Override
+             

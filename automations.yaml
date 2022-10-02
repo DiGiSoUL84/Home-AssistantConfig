@@ -1,0 +1,72 @@
+- id: '1645229851756'
+  alias: Living Room Scene Control
+  description: ''
+  use_blueprint:
+    path: kylerw/zooz-zen34-zwave-js.yaml
+    input:
+      zwave_device: 73e83becb7f6597fdb326d515cc6c22e
+      1x_tap_up:
+      - service: script.livingroom_circadian_on
+        data: {}
+      1x_tap_down:
+      - service: script.livingroom_circadian_off
+        data: {}
+      - scene: scene.livingroom_lights_off
+      2x_tap_up:
+      - scene: scene.livingroom_candlelight
+      3x_tap_up:
+      - scene: scene.livingroom_day
+      hold_up:
+      - scene: scene.all_lights_on
+      hold_down:
+      - scene: scene.all_lights_off
+      4x_tap_up:
+      - scene: scene.neal_bedtime
+      2x_tap_down: []
+      3x_tap_down:
+      - scene: scene.livingroom_lights_off
+- id: '1662853562294'
+  alias: Master Bedroom Lighting Controller
+  description: Scene selector for Master Bedroom
+  use_blueprint:
+    path: kylerw/zooz-zen34-zwave-js.yaml
+    input:
+      zwave_device: d5f27a4fd6ff94c75a5018ba06bbc9e0
+      1x_tap_up:
+      - service: script.masterbedroom_circadian_on
+        data: {}
+      1x_tap_down:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.masterbedroom_lights_off
+        metadata: {}
+      2x_tap_up:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.masterbedroom_day
+        metadata: {}
+      3x_tap_up:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.masterbedroom_candlelight
+        metadata: {}
+      4x_tap_up:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.masterbedroom_evening
+        metadata: {}
+      5x_tap_up:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.masterbedroom_bedtime
+        metadata: {}
+      hold_up:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.masterbedroom_sexy_time
+        metadata: {}
+      2x_tap_down:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.masterbedroom_sleep
+        metadata: {}

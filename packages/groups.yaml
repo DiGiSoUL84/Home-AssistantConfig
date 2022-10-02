@@ -1,0 +1,64 @@
+###############################################################################
+#   @author         :   Chris Smith
+#   @date           :   07/08/2022
+#   @package        :   Groups
+#   @description    :   Package for handling Groups
+###############################################################################
+
+
+group:
+  parents:
+    name: Parents
+    icon: mdi:human-male-female
+    entities:
+      - device_tracker.chris
+      - device_tracker.rachel
+
+  do_not_disturb:
+    name: Do Not Disturb
+    icon: mdi:volume-mute
+    entities:
+      - switch.kitchen_thing_disturb
+      - switch.livingroom_thing_disturb
+      - switch.masterbathroom_thing_disturb
+      - switch.masterbedroom_thing_disturb
+      - switch.echo_disturb
+
+  arriving:
+    name: Arriving
+    entities: []
+
+  entryway:
+    name: Entryway
+    entities:
+      - binary_sensor.front_door
+      - lock.lock_thing
+      
+  livingroom:
+    name: Living Room
+    entities:
+      - binary_sensor.livingroom_motion
+      - sensor.livingroom_motion_illuminance
+      - media_player.lgtv
+
+  masterbathroom:
+    name: Master Bathroom
+    entities:
+      - binary_sensor.masterbathroom_motion
+      - sensor.masterbathroom_motion_temp
+      - sensor.masterbathroom_motion_illuminance
+      - binary_sensor.masterbathroom_door
+      - sensor.masterbathroom_door_temp
+
+  masterbedroom:
+    name: Master Bedroom
+    entities:
+      - media_player.masterbedroom_thing
+      - media_player.vizio_tv
+      
+  guestbathroom:
+    name: Guest Bathroom
+    entities:
+      - binary_sensor.guestbathroom_motion
+      - binary_sensor.guestbathroom_door
+      - sensor.guestbathroom_motion_temp
