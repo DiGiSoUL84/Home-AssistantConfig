@@ -11,7 +11,7 @@
 - url: /hacsfiles/weather-radar-card/weather-radar-card.js
   type: module
 - url: /hacsfiles/custom-brand-icons/custom-brand-icons.js
-  type: module 
+  type: module
 - url: /hacsfiles/Home-Assistant-Lovelace-HTML-Jinja2-Template-card/html-template-card.js
   type: module
 - url: /hacsfiles/lovelace-swipe-navigation/swipe-navigation.js

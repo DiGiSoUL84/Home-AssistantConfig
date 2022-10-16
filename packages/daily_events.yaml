@@ -9,16 +9,6 @@
 sensor:
   - platform: template
     sensors:
-      quiet_time:
-        friendly_name: "Quiet Time"
-        value_template: >
-          {% set current_hour = strptime(states('sensor.time'), "%H:%M").hour %}
-          {% if 6 <= current_hour < 22 %}
-            loud time
-          {% else %}
-            quiet time
-          {% endif %}
-
       home_mode:
         friendly_name: "Home Mode"
         value_template: >
@@ -38,30 +28,6 @@ sensor:
             late night
           {% endif %}
         icon_template: mdi:content-paste
-
-      time_of_day:
-        friendly_name: "Time of Day"
-        value_template: >
-          {% if is_state('binary_sensor.early_morning', 'on') %}
-            early morning
-          {% elif is_state('binary_sensor.morning', 'on') %}
-            morning
-          {% elif is_state('binary_sensor.afternoon', 'on') %}
-            afternoon
-          {% elif is_state('binary_sensor.evening', 'on') %}
-            evening
-          {% elif is_state('binary_sensor.bedtime', 'on') %}
-            bedtime
-          {% elif is_state('binary_sensor.sleep', 'on') %}
-            sleep
-          {% else %}
-            late night
-          {% endif %}
-        icon_template: mdi:clock-digital
-
-
-automation:
-
 
 
 script:

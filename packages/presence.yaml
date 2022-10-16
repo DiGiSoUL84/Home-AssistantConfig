@@ -177,7 +177,7 @@ automation:
           - device_tracker.rachel
           - device_tracker.blane
           - device_tracker.gage
-          - device_tracker.avery
+    #      - device_tracker.avery
           - device_tracker.neal
         from: "not_home"
         to: "home"
@@ -278,7 +278,7 @@ automation:
           - device_tracker.rachel
           - device_tracker.blane
           - device_tracker.gage
-          - device_tracker.avery
+  #        - device_tracker.avery
         from: "home"
         to: "not_home"
 

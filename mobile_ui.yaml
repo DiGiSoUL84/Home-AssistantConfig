@@ -17,3 +17,4 @@ views:
   - !include lovelace/guest_bathroom.yaml
   - !include lovelace/master_bathroom.yaml
   - !include lovelace/media_players.yaml
+ 
