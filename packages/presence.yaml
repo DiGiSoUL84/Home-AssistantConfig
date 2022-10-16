@@ -49,7 +49,7 @@ device_tracker:
       - device_tracker.blane_stacks
       - binary_sensor.pixel_blane
       - device_tracker.pixel_blane_wifi
-     
+
   - platform: composite
     name: Gage
     time_as: device_or_local
@@ -101,7 +101,7 @@ template:
         state: >
           {{ is_state('device_tracker.pixel_chris_wifi', 'home') }}
         device_class: presence
-   
+
       - name: "Pixel Rachel"
         state: >
           {{ is_state('device_tracker.pixel_rachel_wifi', 'home') }}
@@ -111,7 +111,7 @@ template:
         state: >
           {{ is_state('device_tracker.pixel_blane_wifi', 'home') }}
         device_class: presence
-                 
+
       - name: "Pixel Gage"
         state: >
           {{ is_state('device_tracker.pixel_gage_wifi', 'home') }}
@@ -177,7 +177,7 @@ automation:
           - device_tracker.rachel
           - device_tracker.blane
           - device_tracker.gage
-    #      - device_tracker.avery
+          - device_tracker.avery
           - device_tracker.neal
         from: "not_home"
         to: "home"
@@ -194,17 +194,18 @@ automation:
           - conditions:
               - condition: template
                 value_template: >
-                 {{ is_state('sensor.quiet_time', 'loud time') or is_state('input_boolean.speech_notifications', 'on') }}
-      
+                  {{ is_state('sensor.quiet_time', 'loud time') or is_state('input_boolean.speech_notifications', 'on') }}
+
             sequence:
               - service: group.set
                 data:
                   object_id: "arriving"
                   add_entities: >-
                     {{ trigger.to_state.entity_id }}
-            
-              - wait_template: "{{ is_state('binary_sensor.front_door', 'on') }}"
-             
+
+              - wait_template: >
+                  {{ is_state('binary_sensor.front_door', 'on') }}
+
               - service: input_select.select_option
                 target:
                   entity_id: input_select.media_player
@@ -262,7 +263,7 @@ automation:
       - service: script.auto_lock
       
       - delay: "00:01:00"
-         
+
       - service: group.set
         data:
           object_id: "arriving"
@@ -278,7 +279,7 @@ automation:
           - device_tracker.rachel
           - device_tracker.blane
           - device_tracker.gage
-  #        - device_tracker.avery
+          - device_tracker.avery
         from: "home"
         to: "not_home"
 
