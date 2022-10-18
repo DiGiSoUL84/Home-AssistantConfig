@@ -250,7 +250,7 @@ automation:
 
   - id: washer_status_update
     alias: "Washer Status Update"
-   
+
     trigger:
       - platform: state
         entity_id: sensor.washer_thing_state
@@ -264,11 +264,11 @@ automation:
 
   - id: dryer_status_update
     alias: "Dryer Status Update"
-   
+  
     trigger:
       - platform: state
         entity_id: sensor.dryer_thing_state
-   
+
     action:
       - service: mqtt.publish
         data_template:
@@ -278,21 +278,21 @@ automation:
 
   - id: washer_cycle_count
     alias: 'Count cycle when washer finished'
-   
+
     trigger:
       - platform: state
         entity_id: 'sensor.washer_thing_state'
         to: 'Finish'
- 
+
     condition:
       - condition: template
         value_template: >-
-           {{ states('sensor.washer_program')[-9:] != 'Course_D4' 
-              and states('sensor.washer_program')[-9:] != 'Course_D5' 
-              and states('sensor.washer_program')[-9:] != 'Course_BA' 
-              and trigger.from_state.state != 'Off' 
-              and trigger.from_state.state != 'Stop' 
-              and trigger.from_state.state != 'None' }}
+          {{ states('sensor.washer_program')[-9:] != 'Course_D4' 
+            and states('sensor.washer_program')[-9:] != 'Course_D5' 
+            and states('sensor.washer_program')[-9:] != 'Course_BA' 
+            and trigger.from_state.state != 'Off' 
+            and trigger.from_state.state != 'Stop' 
+            and trigger.from_state.state != 'None' }}
     action:
       - service: input_number.increment
         data:
@@ -318,14 +318,14 @@ automation:
 
   - id: update_washer_api
     alias: "Update SmartThings data via API"
-   
+
     trigger:
       - platform: state
         entity_id: sensor.washer_thing_machine_state
         to: 
           - 'run'
           - 'stop'
-   
+
       - platform: state
         entity_id: sensor.washer_thing_state
         to:
@@ -338,7 +338,7 @@ automation:
           - 'wash'
           - 'weightSensing'
           - 'wrinklePrevent'
- 
+
     action:
       - service: homeassistant.update_entity
         data:

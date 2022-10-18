@@ -54,6 +54,7 @@ mobile_app:
 
 python_script:
 
+script: !include_dir_merge_list scripts
 ssdp:
 sun:
 switch:

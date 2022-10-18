@@ -5,7 +5,6 @@
 #   @description    :   Package for handling Presence related entities
 ###############################################################################
 
-
 group:
   residents:
     name: Residents
@@ -18,7 +17,6 @@ group:
       - device_tracker.avery
       - device_tracker.neal
 
-
 device_tracker:
   - platform: composite
     name: Chris
@@ -29,7 +27,7 @@ device_tracker:
       - device_tracker.chris_smith
       - device_tracker.pixel_chris_wifi
       - binary_sensor.pixel_chris
-      
+
   - platform: composite
     name: Rachel
     time_as: device_or_local
@@ -39,7 +37,7 @@ device_tracker:
       - device_tracker.rachel_smith
       - device_tracker.pixel_rachel_wifi
       - binary_sensor.pixel_rachel
-      
+
   - platform: composite
     name: Blane
     time_as: device_or_local
@@ -59,7 +57,7 @@ device_tracker:
       - device_tracker.gage_stacks
       - binary_sensor.pixel_gage
       - device_tracker.pixel_gage_wifi
-      
+
   - platform: composite
     name: Avery
     time_as: device_or_local
@@ -78,7 +76,6 @@ device_tracker:
       - device_tracker.galaxy_gps
       - device_tracker.tile_neal
 
-
 proximity:
   home_chris:
     devices:
@@ -93,7 +90,6 @@ proximity:
     zone: home
     tolerance: 5
     unit_of_measurement: mi
-
 
 template:
   - binary_sensor:
@@ -116,28 +112,26 @@ template:
         state: >
           {{ is_state('device_tracker.pixel_gage_wifi', 'home') }}
         device_class: presence
-      
+
       - name: "Iphone Avery"
         state: >
           {{ is_state('device_tracker.iphone_avery_wifi', 'home') }}
         device_class: presence
-
 
 input_boolean:
   home_occupied:
     name: "Home Occupied"
     icon: mdi:home-modern
 
-
 automation:
   - id: home_occupancy
     alias: "Home Occupancy"
     mode: queued
 
-    trigger: 
+    trigger:
       - platform: state
         entity_id: group.residents
-        
+
       - platform: homeassistant
         event: start
 
@@ -150,7 +144,7 @@ automation:
               - condition: state
                 entity_id: group.residents
                 state: "home"
-                
+
             sequence:
               - service: input_boolean.turn_on
                 entity_id: input_boolean.home_occupied
@@ -159,17 +153,17 @@ automation:
               - condition: state
                 entity_id: group.residents
                 state: "not_home"
-                
+
             sequence:
               - service: input_boolean.turn_off
                 entity_id: input_boolean.home_occupied
-              
+
               - service: script.all_gone
 
   - id: just_got_home
     alias: "Just Got Home"
     mode: restart
-    
+
     trigger:
       - platform: state
         entity_id:
@@ -178,23 +172,22 @@ automation:
           - device_tracker.blane
           - device_tracker.gage
           - device_tracker.avery
-          - device_tracker.neal
         from: "not_home"
         to: "home"
-          
+
     condition:
       - condition: numeric_state
         entity_id: sensor.ha_uptime
         above: 5
-        
+
     action:
       - service: script.auto_unlock
-      
-      - choose: 
+
+      - choose:
           - conditions:
-              - condition: template
-                value_template: >
-                  {{ is_state('sensor.quiet_time', 'loud time') or is_state('input_boolean.speech_notifications', 'on') }}
+              - condition: state
+                entity_id: sensor.quiet_time
+                state: "loud time"
 
             sequence:
               - service: group.set
@@ -206,12 +199,8 @@ automation:
               - wait_template: >
                   {{ is_state('binary_sensor.front_door', 'on') }}
 
-              - service: input_select.select_option
-                target:
-                  entity_id: input_select.media_player
-                data:
-                  option: "Living Room Thing"
-                  
+ 
+
               - service: script.speech_engine
                 data:
                   CustomMessage: >
@@ -257,18 +246,18 @@ automation:
 
       - wait_template: >
           {{ is_state('binary_sensor.front_door', 'on') }}
-      
+
       - delay: "00:00:10"
-      
+
       - service: script.auto_lock
-      
+
       - delay: "00:01:00"
 
       - service: group.set
         data:
           object_id: "arriving"
           entities: []
-      
+
   - id: departure
     alias: "Departure"
 
@@ -283,12 +272,10 @@ automation:
         from: "home"
         to: "not_home"
 
-    condition:
-      - condition: state
-        entity_id: binary_sensor.front_door
-        state: "off"
-
     action:
+      - wait_template: >
+          {{ is_state('binary_sensor.front_door', 'off') }}
+
       - service: lock.lock
         target:
           entity_id: lock.lock_thing
@@ -296,7 +283,6 @@ automation:
       - service: notify.parents
         data:
           message: "Door is Locked for {{ trigger.to_state.attributes.friendly_name }}"
-
 
 script:
   auto_unlock:
@@ -310,10 +296,10 @@ script:
     alias: "Auto Lock"
     sequence:
       - delay: 00:00:05
-      
+
       - wait_template: >
           {{ is_state('binary_sensor.front_door', 'off') }}
-          
+
       - service: lock.lock
         target:
           entity_id: lock.lock_thing
@@ -322,7 +308,7 @@ script:
     alias: "All Gone"
     sequence:
       - service: light.turn_off
-        entity_id: 
+        entity_id:
           - light.livingroom_lights
           - light.masterbedroom_lights
 
@@ -331,5 +317,3 @@ script:
 
       - service: media_player.turn_off
         entity_id: media_player.vizio_tv
-        
-  
